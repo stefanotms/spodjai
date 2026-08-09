@@ -1,0 +1,33 @@
+# Credenciales y archivos de entorno (Privado)
+.env
+*.env
+backend/.env
+search_cache.json
+user_schedule.json
+cert.pem
+key.pem
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+venv/
+env/
+
+# Android y Gradle
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties
+android/.idea/
+android/gradle-bin/
+android/*.zip
+*.zip
+.gradle/
+build/
+
+# Archivos de SO
+.DS_Store
+Thumbs.db
