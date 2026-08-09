@@ -13,8 +13,8 @@ import java.net.URL
 import java.net.URLEncoder
 
 object SmartAiDjClient {
-    // URL del servidor backend en la nube (Render.com)
-    var BASE_URL = "https://spodjai-backend.onrender.com"
+    // URL del servidor backend en la nube (Render.com 24/7)
+    var BASE_URL = "https://spodjai.onrender.com"
 
     private const val TAG = "SmartAiDjClient"
 

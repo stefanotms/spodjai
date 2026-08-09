@@ -34,11 +34,11 @@ class SmartAiDjViewModel(application: Application) : AndroidViewModel(applicatio
     var scheduleEnabled by mutableStateOf(false)
     var scheduleHour by mutableStateOf(8)
     var scheduleMinute by mutableStateOf(0)
-    var backendIp by mutableStateOf("spodjai-backend.onrender.com")
+    var backendIp by mutableStateOf("spodjai.onrender.com")
 
     init {
         // Establecer URL en la nube por defecto
-        updateIpAddress("spodjai-backend.onrender.com")
+        updateIpAddress("spodjai.onrender.com")
         
         // Al arrancar, verificamos si ya existe una sesión guardada
         val savedRefreshToken = tokenManager.getRefreshToken()
