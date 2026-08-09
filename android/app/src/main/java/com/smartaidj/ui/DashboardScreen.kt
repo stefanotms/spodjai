@@ -2,10 +2,13 @@ package com.smartaidj.ui
 
 import android.content.Intent
 import android.net.Uri
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExitToApp
@@ -15,12 +18,15 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.smartaidj.R
 import com.smartaidj.network.SmartAiDjClient
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -34,9 +40,22 @@ fun DashboardScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("SpodjAI Dashboard", fontWeight = FontWeight.Bold) },
+                title = {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Image(
+                            painter = painterResource(id = R.drawable.ic_spodjai_logo),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .size(34.dp)
+                                .clip(CircleShape)
+                                .border(1.dp, Color(0xFF1DB954), CircleShape)
+                        )
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Text("SpodjAI", fontWeight = FontWeight.Black, letterSpacing = 1.sp)
+                    }
+                },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF1E1E1E),
+                    containerColor = Color(0xFF111115),
                     titleContentColor = Color.White,
                     actionIconContentColor = Color.White
                 ),
@@ -51,7 +70,7 @@ fun DashboardScreen(
                 }
             )
         },
-        containerColor = Color(0xFF121212)
+        containerColor = Color(0xFF09090B)
     ) { paddingValues ->
         Column(
             modifier = Modifier
