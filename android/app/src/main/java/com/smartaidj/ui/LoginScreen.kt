@@ -76,12 +76,36 @@ fun LoginScreen(viewModel: SmartAiDjViewModel) {
                 lineHeight = 20.sp
             )
 
-            Spacer(modifier = Modifier.height(48.dp))
+            // Campo editable con la URL del servidor en la nube
+            OutlinedTextField(
+                value = ipInput,
+                onValueChange = {
+                    ipInput = it
+                    viewModel.updateIpAddress(it)
+                },
+                label = { Text("URL del Servidor Render", color = Color(0xFF1DB954)) },
+                placeholder = { Text("spodjai-backend.onrender.com") },
+                singleLine = true,
+                shape = RoundedCornerShape(12.dp),
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    focusedBorderColor = Color(0xFF1DB954),
+                    unfocusedBorderColor = Color(0xFF404040),
+                    focusedTextColor = Color.White,
+                    unfocusedTextColor = Color.White
+                ),
+                modifier = Modifier.fillMaxWidth()
+            )
 
-            // Botón de Login directo a la Nube
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Botón de Login a la Nube
             Button(
                 onClick = {
-                    val loginUrl = "${SmartAiDjClient.BASE_URL}/login?platform=mobile"
+                    val protocol = when {
+                        ipInput.startsWith("http://") || ipInput.startsWith("https://") -> ""
+                        else -> "https://"
+                    }
+                    val loginUrl = "$protocol$ipInput/login?platform=mobile"
                     val intent = Intent(Intent.ACTION_VIEW, Uri.parse(loginUrl))
                     context.startActivity(intent)
                 },
