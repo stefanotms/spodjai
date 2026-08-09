@@ -153,11 +153,11 @@ fun DashboardScreen(
                     Spacer(modifier = Modifier.height(10.dp))
 
                     val moods = listOf(
-                        "general" to "⚡ General",
-                        "gym" to "🏋️‍♂️ Gym",
-                        "roadtrip" to "🚗 Road",
-                        "chill" to "🌙 Chill",
-                        "party" to "🎉 Fiesta"
+                        "general" to "General",
+                        "gym" to "Gym",
+                        "roadtrip" to "Road",
+                        "chill" to "Chill",
+                        "party" to "Fiesta"
                     )
 
                     Row(
@@ -214,7 +214,7 @@ fun DashboardScreen(
                     ) {
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
-                                text = "⏰ AUTO-UPDATE DIARIO",
+                                text = "AUTO-UPDATE DIARIO",
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.Bold,
                                 letterSpacing = 1.sp,
