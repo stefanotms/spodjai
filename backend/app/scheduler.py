@@ -9,7 +9,7 @@ from apscheduler.triggers.cron import CronTrigger
 logger = logging.getLogger("uvicorn")
 
 SCHEDULE_FILE = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "user_schedule.json")
-scheduler = BackgroundScheduler()
+scheduler = BackgroundScheduler(timezone="UTC")
 
 def load_schedule_config() -> Dict[str, Any]:
     """Carga la configuración de la tarea programada desde user_schedule.json."""

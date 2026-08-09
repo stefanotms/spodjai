@@ -25,7 +25,10 @@ app = FastAPI(
 
 @app.on_event("startup")
 def on_startup():
-    start_scheduler()
+    try:
+        start_scheduler()
+    except Exception as e:
+        logger.error(f"Error al iniciar el scheduler en arranque: {e}")
 
 spotify_client = SpotifyClient()
 
