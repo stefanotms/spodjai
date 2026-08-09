@@ -16,6 +16,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.smartaidj.network.SmartAiDjClient
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -77,38 +78,10 @@ fun LoginScreen(viewModel: SmartAiDjViewModel) {
 
             Spacer(modifier = Modifier.height(48.dp))
 
-            // Campo para configurar la IP del Servidor
-            OutlinedTextField(
-                value = ipInput,
-                onValueChange = {
-                    ipInput = it
-                    viewModel.updateIpAddress(it)
-                },
-                label = { Text("IP del Servidor Backend", color = Color(0xFF1DB954)) },
-                placeholder = { Text("10.0.2.2:8000") },
-                singleLine = true,
-                shape = RoundedCornerShape(12.dp),
-                colors = TextFieldDefaults.outlinedTextFieldColors(
-                    focusedBorderColor = Color(0xFF1DB954),
-                    unfocusedBorderColor = Color(0xFF404040),
-                    focusedTextColor = Color.White,
-                    unfocusedTextColor = Color.White
-                ),
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            // Botón de Login
+            // Botón de Login directo a la Nube
             Button(
                 onClick = {
-                    // Determinar protocolo automáticamente: localhost/emulator usa http, IPs de red usan https
-                    val protocol = when {
-                        ipInput.startsWith("http://") || ipInput.startsWith("https://") -> ""
-                        ipInput.startsWith("10.0.2.2") || ipInput.startsWith("127.0.0.1") || ipInput.startsWith("localhost") -> "http://"
-                        else -> "https://"
-                    }
-                    val loginUrl = "$protocol$ipInput/login?platform=mobile"
+                    val loginUrl = "${SmartAiDjClient.BASE_URL}/login?platform=mobile"
                     val intent = Intent(Intent.ACTION_VIEW, Uri.parse(loginUrl))
                     context.startActivity(intent)
                 },
