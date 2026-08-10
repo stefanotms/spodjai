@@ -3,6 +3,12 @@ from typing import Dict, Any, List
 from urllib.parse import urlencode
 from app.config import settings
 
+class SpotifyRateLimitException(Exception):
+    """Excepción lanzada cuando Spotify responde con un código de estado 429 (Límite de Tasa)."""
+    def __init__(self, retry_after: int):
+        self.retry_after = retry_after
+        super().__init__(f"Spotify Rate Limit alcanzado. Reintentar en {retry_after} segundos.")
+
 class SpotifyClient:
     def __init__(self):
         import os
@@ -232,18 +238,13 @@ class SpotifyClient:
                         resp = await client.get(url, headers=headers, params=params)
                         if resp.status_code == 429:
                             retry_after = int(resp.headers.get("Retry-After", 2))
-                            # Si Spotify nos dice que esperemos más de 10 segundos, no bloqueamos la app,
-                            # retornamos None para que siga con las demás en lugar de congelar el backend.
-                            if retry_after > 10:
-                                import logging
-                                logging.getLogger("uvicorn").warning(f"Límite de tasa severo ({retry_after}s) para '{q_str}'. Evitando bloqueo, saltando canción...")
-                                return None
                             import logging
-                            logging.getLogger("uvicorn").warning(f"Límite de tasa de Spotify alcanzado (429) para '{q_str}'. Esperando {retry_after} segundos antes de reintentar...")
-                            await asyncio.sleep(retry_after)
-                            continue
+                            logging.getLogger("uvicorn").warning(f"Límite de tasa de Spotify (429) alcanzado para '{q_str}'. Retry-After: {retry_after}s.")
+                            raise SpotifyRateLimitException(retry_after)
                         resp.raise_for_status()
                         return resp
+                    except SpotifyRateLimitException as e:
+                        raise e
                     except Exception as e:
                         if attempt == 3:
                             raise e
@@ -259,6 +260,8 @@ class SpotifyClient:
                         self.search_cache[cache_key] = uri
                         self.save_search_cache()
                         return uri
+            except SpotifyRateLimitException as rate_err:
+                raise rate_err
             except Exception:
                 pass
             
@@ -273,6 +276,8 @@ class SpotifyClient:
                         self.search_cache[cache_key] = uri
                         self.save_search_cache()
                         return uri
+            except SpotifyRateLimitException as rate_err:
+                raise rate_err
             except Exception:
                 pass
                 
