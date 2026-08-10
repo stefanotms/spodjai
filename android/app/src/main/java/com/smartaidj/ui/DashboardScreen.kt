@@ -74,121 +74,124 @@ fun DashboardScreen(
         },
         containerColor = Color(0xFF09090B)
     ) { paddingValues ->
-        Column(
+        LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(horizontal = 20.dp)
+                .padding(horizontal = 20.dp),
+            verticalArrangement = Arrangement.spacedBy(0.dp)
         ) {
-            Spacer(modifier = Modifier.height(16.dp))
+            item {
+                Spacer(modifier = Modifier.height(16.dp))
 
-            // Controles de Configuración
-            Card(
-                colors = CardDefaults.cardColors(containerColor = Color(0xFF131316)),
-                shape = RoundedCornerShape(18.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .border(1.dp, Color(0xFF222227), RoundedCornerShape(18.dp))
-            ) {
-                Column(modifier = Modifier.padding(20.dp)) {
-                    Text(
-                        text = "CONFIGURACIÓN DEL DJ",
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        letterSpacing = 1.5.sp,
-                        color = Color(0xFFA0A0AB)
-                    )
-
-                    Spacer(modifier = Modifier.height(20.dp))
-
-                    // Slider de Cantidad de Canciones
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text("Tamaño de Playlist", color = Color(0xFFA0A0AB), fontSize = 14.sp)
-                        Text("${viewModel.limit} temas", color = Color(0xFF1DB954), fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                    }
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Slider(
-                        value = viewModel.limit.toFloat(),
-                        onValueChange = { viewModel.limit = it.toInt() },
-                        valueRange = 10f..100f,
-                        steps = 9,
-                        colors = SliderDefaults.colors(
-                            thumbColor = Color(0xFF1DB954),
-                            activeTrackColor = Color(0xFF1DB954),
-                            inactiveTrackColor = Color(0xFF2A2A32)
+                // Controles de Configuración
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFF131316)),
+                    shape = RoundedCornerShape(18.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .border(1.dp, Color(0xFF222227), RoundedCornerShape(18.dp))
+                ) {
+                    Column(modifier = Modifier.padding(20.dp)) {
+                        Text(
+                            text = "CONFIGURACIÓN DEL DJ",
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            letterSpacing = 1.5.sp,
+                            color = Color(0xFFA0A0AB)
                         )
-                    )
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(20.dp))
 
-                    // Slider de Proporción Descubrimiento / Confort
-                    val comfortPercent = ((1f - viewModel.discoveryRatio) * 100).toInt()
-                    val discoveryPercent = (viewModel.discoveryRatio * 100).toInt()
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text("Balance (Comfort / Descubrir)", color = Color(0xFFA0A0AB), fontSize = 14.sp)
-                        Text("$comfortPercent% / $discoveryPercent%", color = Color(0xFF1DB954), fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                    }
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Slider(
-                        value = viewModel.discoveryRatio,
-                        onValueChange = { viewModel.discoveryRatio = it },
-                        valueRange = 0.0f..1.0f,
-                        colors = SliderDefaults.colors(
-                            thumbColor = Color(0xFF1DB954),
-                            activeTrackColor = Color(0xFF1DB954),
-                            inactiveTrackColor = Color(0xFF2A2A32)
+                        // Slider de Cantidad de Canciones
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text("Tamaño de Playlist", color = Color(0xFFA0A0AB), fontSize = 14.sp)
+                            Text("${viewModel.limit} temas", color = Color(0xFF1DB954), fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                        }
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Slider(
+                            value = viewModel.limit.toFloat(),
+                            onValueChange = { viewModel.limit = it.toInt() },
+                            valueRange = 10f..100f,
+                            steps = 9,
+                            colors = SliderDefaults.colors(
+                                thumbColor = Color(0xFF1DB954),
+                                activeTrackColor = Color(0xFF1DB954),
+                                inactiveTrackColor = Color(0xFF2A2A32)
+                            )
                         )
-                    )
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(16.dp))
 
-                    // Selector de Mood (Estado de Ánimo)
-                    Text("ESTADO DE ÁNIMO (MOOD)", fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp, color = Color(0xFFA0A0AB))
-                    Spacer(modifier = Modifier.height(10.dp))
+                        // Slider de Proporción Descubrimiento / Confort
+                        val comfortPercent = ((1f - viewModel.discoveryRatio) * 100).toInt()
+                        val discoveryPercent = (viewModel.discoveryRatio * 100).toInt()
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text("Balance (Comfort / Descubrir)", color = Color(0xFFA0A0AB), fontSize = 14.sp)
+                            Text("$comfortPercent% / $discoveryPercent%", color = Color(0xFF1DB954), fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                        }
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Slider(
+                            value = viewModel.discoveryRatio,
+                            onValueChange = { viewModel.discoveryRatio = it },
+                            valueRange = 0.0f..1.0f,
+                            colors = SliderDefaults.colors(
+                                thumbColor = Color(0xFF1DB954),
+                                activeTrackColor = Color(0xFF1DB954),
+                                inactiveTrackColor = Color(0xFF2A2A32)
+                            )
+                        )
 
-                    val moods = listOf(
-                        "general" to "General",
-                        "gym" to "Gym",
-                        "roadtrip" to "Road",
-                        "chill" to "Chill",
-                        "party" to "Fiesta"
-                    )
+                        Spacer(modifier = Modifier.height(16.dp))
 
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        moods.forEach { (key, label) ->
-                            val isSelected = viewModel.selectedMood == key
-                            Surface(
-                                onClick = { viewModel.selectedMood = key },
-                                shape = RoundedCornerShape(24.dp),
-                                color = if (isSelected) Color(0xFF1DB954) else Color(0xFF1F1F24),
-                                contentColor = if (isSelected) Color.Black else Color(0xFFA0A0AB),
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .border(
-                                        width = 1.dp,
-                                        color = if (isSelected) Color(0xFF1DB954) else Color(0xFF2D2D34),
-                                        shape = RoundedCornerShape(24.dp)
-                                    )
-                            ) {
-                                Box(
-                                    contentAlignment = Alignment.Center,
-                                    modifier = Modifier.padding(vertical = 8.dp)
+                        // Selector de Mood (Estado de Ánimo)
+                        Text("ESTADO DE ÁNIMO (MOOD)", fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp, color = Color(0xFFA0A0AB))
+                        Spacer(modifier = Modifier.height(10.dp))
+
+                        val moods = listOf(
+                            "general" to "General",
+                            "gym" to "Gym",
+                            "roadtrip" to "Road",
+                            "chill" to "Chill",
+                            "party" to "Fiesta"
+                        )
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            moods.forEach { (key, label) ->
+                                val isSelected = viewModel.selectedMood == key
+                                Surface(
+                                    onClick = { viewModel.selectedMood = key },
+                                    shape = RoundedCornerShape(24.dp),
+                                    color = if (isSelected) Color(0xFF1DB954) else Color(0xFF1F1F24),
+                                    contentColor = if (isSelected) Color.Black else Color(0xFFA0A0AB),
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .border(
+                                            width = 1.dp,
+                                            color = if (isSelected) Color(0xFF1DB954) else Color(0xFF2D2D34),
+                                            shape = RoundedCornerShape(24.dp)
+                                        )
                                 ) {
-                                    Text(
-                                        text = label,
-                                        fontSize = 11.sp,
-                                        fontWeight = if (isSelected) FontWeight.ExtraBold else FontWeight.Normal,
-                                        maxLines = 1
-                                    )
+                                    Box(
+                                        contentAlignment = Alignment.Center,
+                                        modifier = Modifier.padding(vertical = 8.dp)
+                                    ) {
+                                        Text(
+                                            text = label,
+                                            fontSize = 11.sp,
+                                            fontWeight = if (isSelected) FontWeight.ExtraBold else FontWeight.Normal,
+                                            maxLines = 1
+                                        )
+                                    }
                                 }
                             }
                         }
@@ -196,94 +199,96 @@ fun DashboardScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            item {
+                Spacer(modifier = Modifier.height(12.dp))
 
-            // Tarjeta de Programación Automática (Cron Job Diario)
-            Card(
-                colors = CardDefaults.cardColors(containerColor = Color(0xFF131316)),
-                shape = RoundedCornerShape(18.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .border(1.dp, Color(0xFF222227), RoundedCornerShape(18.dp))
-            ) {
-                Column(modifier = Modifier.padding(20.dp)) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                text = "AUTO-UPDATE DIARIO",
-                                fontSize = 12.sp,
-                                fontWeight = FontWeight.Bold,
-                                letterSpacing = 1.sp,
-                                color = Color.White
-                            )
-                            Spacer(modifier = Modifier.height(2.dp))
-                            Text(
-                                text = if (viewModel.scheduleEnabled) 
-                                    "Actualización programada a las ${viewModel.scheduleHour.toString().padStart(2, '0')}:00 hs" 
-                                    else "Desactivado",
-                                fontSize = 12.sp,
-                                color = Color(0xFFA0A0AB)
-                            )
-                        }
-
-                        Switch(
-                            checked = viewModel.scheduleEnabled,
-                            onCheckedChange = { isChecked ->
-                                viewModel.updateSchedule(isChecked, viewModel.scheduleHour, viewModel.scheduleMinute)
-                            },
-                            colors = SwitchDefaults.colors(
-                                checkedThumbColor = Color.Black,
-                                checkedTrackColor = Color(0xFF1DB954),
-                                uncheckedThumbColor = Color(0xFFA0A0AB),
-                                uncheckedTrackColor = Color(0xFF1F1F24)
-                            )
-                        )
-                    }
-
-                    if (viewModel.scheduleEnabled) {
-                        Spacer(modifier = Modifier.height(16.dp))
+                // Tarjeta de Programación Automática (Cron Job Diario)
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFF131316)),
+                    shape = RoundedCornerShape(18.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .border(1.dp, Color(0xFF222227), RoundedCornerShape(18.dp))
+                ) {
+                    Column(modifier = Modifier.padding(20.dp)) {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text("Hora de ejecución:", color = Color(0xFFA0A0AB), fontSize = 14.sp)
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                OutlinedButton(
-                                    onClick = {
-                                        val newHour = if (viewModel.scheduleHour > 0) viewModel.scheduleHour - 1 else 23
-                                        viewModel.updateSchedule(true, newHour, 0)
-                                    },
-                                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
-                                    shape = RoundedCornerShape(12.dp),
-                                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White)
-                                ) {
-                                    Text("-", fontSize = 18.sp, fontWeight = FontWeight.Bold)
-                                }
-
-                                Spacer(modifier = Modifier.width(12.dp))
+                            Column(modifier = Modifier.weight(1f)) {
                                 Text(
-                                    text = "${viewModel.scheduleHour.toString().padStart(2, '0')}:00",
-                                    fontSize = 16.sp,
-                                    fontWeight = FontWeight.Black,
-                                    color = Color(0xFF1DB954)
+                                    text = "AUTO-UPDATE DIARIO",
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    letterSpacing = 1.sp,
+                                    color = Color.White
                                 )
-                                Spacer(modifier = Modifier.width(12.dp))
+                                Spacer(modifier = Modifier.height(2.dp))
+                                Text(
+                                    text = if (viewModel.scheduleEnabled) 
+                                        "Actualización programada a las ${viewModel.scheduleHour.toString().padStart(2, '0')}:00 hs" 
+                                        else "Desactivado",
+                                    fontSize = 12.sp,
+                                    color = Color(0xFFA0A0AB)
+                                )
+                            }
 
-                                OutlinedButton(
-                                    onClick = {
-                                        val newHour = if (viewModel.scheduleHour < 23) viewModel.scheduleHour + 1 else 0
-                                        viewModel.updateSchedule(true, newHour, 0)
-                                    },
-                                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
-                                    shape = RoundedCornerShape(12.dp),
-                                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White)
-                                ) {
-                                    Text("+", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                            Switch(
+                                checked = viewModel.scheduleEnabled,
+                                onCheckedChange = { isChecked ->
+                                    viewModel.updateSchedule(isChecked, viewModel.scheduleHour, viewModel.scheduleMinute)
+                                },
+                                colors = SwitchDefaults.colors(
+                                    checkedThumbColor = Color.Black,
+                                    checkedTrackColor = Color(0xFF1DB954),
+                                    uncheckedThumbColor = Color(0xFFA0A0AB),
+                                    uncheckedTrackColor = Color(0xFF1F1F24)
+                                )
+                            )
+                        }
+
+                        if (viewModel.scheduleEnabled) {
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text("Hora de ejecución:", color = Color(0xFFA0A0AB), fontSize = 14.sp)
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    OutlinedButton(
+                                        onClick = {
+                                            val newHour = if (viewModel.scheduleHour > 0) viewModel.scheduleHour - 1 else 23
+                                            viewModel.updateSchedule(true, newHour, 0)
+                                        },
+                                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
+                                        shape = RoundedCornerShape(12.dp),
+                                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White)
+                                    ) {
+                                        Text("-", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                                    }
+
+                                    Spacer(modifier = Modifier.width(12.dp))
+                                    Text(
+                                        text = "${viewModel.scheduleHour.toString().padStart(2, '0')}:00",
+                                        fontSize = 16.sp,
+                                        fontWeight = FontWeight.Black,
+                                        color = Color(0xFF1DB954)
+                                    )
+                                    Spacer(modifier = Modifier.width(12.dp))
+
+                                    OutlinedButton(
+                                        onClick = {
+                                            val newHour = if (viewModel.scheduleHour < 23) viewModel.scheduleHour + 1 else 0
+                                            viewModel.updateSchedule(true, newHour, 0)
+                                        },
+                                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
+                                        shape = RoundedCornerShape(12.dp),
+                                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White)
+                                    ) {
+                                        Text("+", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                                    }
                                 }
                             }
                         }
@@ -291,83 +296,90 @@ fun DashboardScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
+            item {
+                Spacer(modifier = Modifier.height(20.dp))
 
-            // Botón de Acción Principal
-            Button(
-                onClick = { viewModel.generatePlaylist() },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF1DB954),
-                    contentColor = Color.Black
-                ),
-                shape = RoundedCornerShape(26.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(52.dp)
-            ) {
-                Icon(Icons.Default.Refresh, contentDescription = null)
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("REGENERAR PLAYLIST", fontWeight = FontWeight.ExtraBold, letterSpacing = 1.sp)
-            }
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            // Botón para abrir en Spotify si está disponible
-            if (!state.playlistUrl.isNullOrEmpty()) {
-                OutlinedButton(
-                    onClick = {
-                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(state.playlistUrl))
-                        context.startActivity(intent)
-                    },
-                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFF1DB954)),
-                    border = BorderStroke(1.5.dp, Color(0xFF1DB954)),
+                // Botón de Acción Principal
+                Button(
+                    onClick = { viewModel.generatePlaylist() },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF1DB954),
+                        contentColor = Color.Black
+                    ),
                     shape = RoundedCornerShape(26.dp),
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(52.dp)
                 ) {
-                    Icon(Icons.Default.PlayArrow, contentDescription = null, tint = Color(0xFF1DB954))
+                    Icon(Icons.Default.Refresh, contentDescription = null)
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("ABRIR EN SPOTIFY", fontWeight = FontWeight.ExtraBold, letterSpacing = 1.sp)
+                    Text("REGENERAR PLAYLIST", fontWeight = FontWeight.ExtraBold, letterSpacing = 1.sp)
                 }
             }
 
-            Spacer(modifier = Modifier.height(28.dp))
-
-            // Listado de Canciones
-            Text(
-                text = "Recomendaciones Generadas (${state.songs.size})",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.ExtraBold,
-                color = Color.White,
-                letterSpacing = 0.5.sp
-            )
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            if (state.songs.isEmpty()) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = "No hay canciones generadas todavía.\nPresiona 'Regenerar Playlist' arriba.",
-                        color = Color(0xFFA0A0AB),
-                        lineHeight = 22.sp,
-                        textAlign = TextAlign.Center
-                    )
-                }
-            } else {
-                LazyColumn(
-                    modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(10.dp)
-                ) {
-                    items(state.songs) { song ->
-                        SongItemCard(song)
+            item {
+                // Botón para abrir en Spotify si está disponible
+                if (!state.playlistUrl.isNullOrEmpty()) {
+                    Spacer(modifier = Modifier.height(10.dp))
+                    OutlinedButton(
+                        onClick = {
+                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(state.playlistUrl))
+                            context.startActivity(intent)
+                        },
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFF1DB954)),
+                        border = BorderStroke(1.5.dp, Color(0xFF1DB954)),
+                        shape = RoundedCornerShape(26.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(52.dp)
+                    ) {
+                        Icon(Icons.Default.PlayArrow, contentDescription = null, tint = Color(0xFF1DB954))
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("ABRIR EN SPOTIFY", fontWeight = FontWeight.ExtraBold, letterSpacing = 1.sp)
                     }
                 }
+            }
+
+            item {
+                Spacer(modifier = Modifier.height(28.dp))
+
+                // Listado de Canciones
+                Text(
+                    text = "Recomendaciones Generadas (${state.songs.size})",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = Color.White,
+                    letterSpacing = 0.5.sp
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
+            }
+
+            if (state.songs.isEmpty()) {
+                item {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(150.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "No hay canciones generadas todavía.\nPresiona 'Regenerar Playlist' arriba.",
+                            color = Color(0xFFA0A0AB),
+                            lineHeight = 22.sp,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
+            } else {
+                items(state.songs) { song ->
+                    SongItemCard(song)
+                    Spacer(modifier = Modifier.height(10.dp))
+                }
+            }
+
+            item {
+                Spacer(modifier = Modifier.height(24.dp))
             }
         }
     }
