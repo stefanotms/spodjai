@@ -11,7 +11,7 @@ from pydantic import BaseModel
 from app.spotify_client import SpotifyClient, SpotifyRateLimitException
 from app.config import settings
 from app.gemini_recommender import generate_recommendations
-from app.scheduler import start_scheduler, load_schedule_config, save_schedule_config, update_scheduler_job
+from app.scheduler import start_scheduler, load_schedule_config, save_schedule_config, update_scheduler_job, run_scheduled_recommendation_async
 
 # Configurar logs para depuración en consola
 logging.basicConfig(level=logging.INFO)
@@ -243,6 +243,20 @@ def set_schedule(req: ScheduleRequest):
     save_schedule_config(config)
     update_scheduler_job()
     return {"status": "success", "config": config}
+
+@app.get("/api/schedule/trigger")
+async def trigger_schedule_manual():
+    """
+    Endpoint para disparar manualmente la actualización programada en segundo plano
+    (útil para crones externos como cron-job.org que despiertan el servidor de Render).
+    """
+    config = load_schedule_config()
+    if not config.get("enabled"):
+        return {"status": "ignored", "reason": "La programación automática no está habilitada en user_schedule.json"}
+    
+    # Disparar en segundo plano para responder rápido a la petición HTTP y evitar timeout
+    asyncio.create_task(run_scheduled_recommendation_async(config))
+    return {"status": "triggered", "message": "Actualización programada iniciada en segundo plano con éxito"}
 
 @app.post("/api/recommend", response_model=RecommendationResponse)
 async def recommend(

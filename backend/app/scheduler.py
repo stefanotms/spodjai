@@ -46,7 +46,7 @@ async def run_scheduled_recommendation_async(config: Dict[str, Any]):
         logger.warning("No hay refresh_token guardado para ejecutar el Auto-Update de SpodjAI.")
         return
 
-    from app.spotify_client import SpotifyClient
+    from app.spotify_client import SpotifyClient, SpotifyRateLimitException
     from app.gemini_recommender import generate_recommendations
 
     spotify_client = SpotifyClient()
@@ -95,22 +95,40 @@ async def run_scheduled_recommendation_async(config: Dict[str, Any]):
             exclude_tracks=existing_tracks, mood=mood
         )
 
-        sem = asyncio.Semaphore(5)
+        # Limitar la concurrencia a 2 peticiones simultáneas para evitar ser bloqueados por el API de Spotify
+        sem = asyncio.Semaphore(2)
+        rate_limit_encountered = False
+
         async def search_and_map(item):
+            nonlocal rate_limit_encountered
+            if rate_limit_encountered:
+                return None
             async with sem:
                 t_name = item.get("track")
                 a_name = item.get("artist")
                 if not t_name or not a_name:
                     return None
                 try:
+                    # Espaciar levemente el inicio de cada búsqueda
+                    await asyncio.sleep(0.15)
                     uri = await spotify_client.search_track(access_token, t_name, a_name)
                     if uri:
                         return {"uri": uri, "item": item}
-                except Exception:
-                    pass
+                except SpotifyRateLimitException as rate_err:
+                    logger.error(f"⏰ [AUTO-UPDATE] Límite de tasa (429) alcanzado: {rate_err}. Deteniendo búsquedas restantes...")
+                    rate_limit_encountered = True
+                except Exception as e:
+                    logger.warning(f"⏰ [AUTO-UPDATE] Error al buscar {t_name} - {a_name}: {e}")
                 return None
 
-        tasks = [search_and_map(item) for item in recommendations]
+        # Crear y ejecutar tareas de forma espaciada
+        tasks = []
+        for i, item in enumerate(recommendations):
+            async def spaced_task(itm, delay):
+                await asyncio.sleep(delay)
+                return await search_and_map(itm)
+            tasks.append(spaced_task(item, i * 0.1))
+
         results = await asyncio.gather(*tasks)
         resolved_uris = [r["uri"] for r in results if r]
 
