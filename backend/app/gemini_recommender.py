@@ -121,7 +121,7 @@ async def generate_recommendations(
         >>> {mood_text} <<<
 
         REGLAS DE RECOMENDACIÓN:
-        1. Genera una lista equilibrada de exactamente {limit} recomendaciones de canciones individuales.
+        1. Genera una lista equilibrada de EXACTAMENTE {limit} canciones recomendadas. Es obligatorio que la lista contenga exactamente {limit} elementos en formato JSON, no te detengas antes de alcanzar este número.
         2. Aplica estrictamente una proporción del {comfort_pct}% / {discovery_pct}%:
            - {comfort_pct}% "Zona de Confort y Hits del Momento": Incluye canciones de sus artistas favoritos, temas guardados en su biblioteca o éxitos/temas de moda del momento que encajen perfectamente con su estilo y con el mood seleccionado.
            - {discovery_pct}% "Descubrimiento y Exploración": Canciones frescas de nuevos artistas, joyas ocultas o temas de micro-géneros compatibles que encajen con el mood seleccionado.
@@ -160,9 +160,9 @@ async def generate_recommendations(
             try:
                 m = genai.GenerativeModel(m_name)
                 try:
-                    response = await m.generate_content_async(prompt, generation_config={"response_mime_type": "application/json"})
+                    response = await m.generate_content_async(prompt, generation_config=generation_config)
                 except Exception:
-                    response = await m.generate_content_async(prompt)
+                    response = await m.generate_content_async(prompt, generation_config={"max_output_tokens": 8192, "temperature": 1.0})
                     
                 if response and response.text:
                     logger.info(f"Éxito con la IA usando el modelo: {m_name}")
