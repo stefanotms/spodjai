@@ -154,6 +154,11 @@ async def run_scheduled_recommendation_async(config: Dict[str, Any]):
 
         logger.info(f"⏰ [AUTO-UPDATE] ¡Éxito! Playlist {playlist_name} actualizada con {len(resolved_uris)} canciones.")
 
+        # Intentar subir el logotipo como portada personalizada de la playlist
+        import os
+        cover_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "playlist_cover.jpg")
+        await spotify_client.set_playlist_cover_from_file(access_token, playlist_id, cover_path)
+
     except Exception as e:
         logger.error(f"⏰ [AUTO-UPDATE] Error durante la ejecución automática: {e}")
 

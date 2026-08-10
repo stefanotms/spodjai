@@ -411,6 +411,11 @@ async def recommend(
 
         logger.info(f"Playlist {playlist_name} actualizada con éxito con {len(resolved_uris)} canciones.")
 
+        # Intentar subir el logotipo como portada personalizada de la playlist
+        import os
+        cover_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "playlist_cover.jpg")
+        await spotify_client.set_playlist_cover_from_file(token, playlist_id, cover_path)
+
         playlist_url = f"https://open.spotify.com/playlist/{playlist_id}"
 
         return RecommendationResponse(

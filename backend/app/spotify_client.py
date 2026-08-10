@@ -30,7 +30,8 @@ class SpotifyClient:
             "playlist-modify-public",
             "playlist-modify-private",
             "playlist-read-private",
-            "playlist-read-collaborative"
+            "playlist-read-collaborative",
+            "ugc-image-upload"
         ]
 
     def load_search_cache(self):
@@ -391,3 +392,46 @@ class SpotifyClient:
                 import logging
                 logging.getLogger(__name__).warning(f"Error al obtener canciones de la playlist: {e}")
             return []
+
+    async def upload_playlist_cover(self, access_token: str, playlist_id: str, image_base64: str) -> bool:
+        """
+        Sube una imagen de portada personalizada (Base64 JPEG) a la playlist de Spotify.
+        """
+        async with httpx.AsyncClient() as client:
+            headers = {
+                "Authorization": f"Bearer {access_token}",
+                "Content-Type": "image/jpeg"
+            }
+            url = f"{self.api_base_url}/playlists/{playlist_id}/images"
+            try:
+                response = await client.put(url, headers=headers, content=image_base64)
+                if response.status_code in [200, 202]:
+                    return True
+                else:
+                    import logging
+                    logging.getLogger("uvicorn").error(f"Error al subir portada a Spotify ({response.status_code}): {response.text}")
+            except Exception as e:
+                import logging
+                logging.getLogger("uvicorn").error(f"Excepción al subir portada a Spotify: {e}")
+            return False
+
+    async def set_playlist_cover_from_file(self, access_token: str, playlist_id: str, file_path: str) -> bool:
+        """
+        Lee una imagen de disco, la codifica en Base64 y la sube como portada de la playlist.
+        """
+        import os
+        import base64
+        if not os.path.exists(file_path):
+            import logging
+            logging.getLogger("uvicorn").warning(f"Archivo de portada no encontrado en {file_path}")
+            return False
+            
+        try:
+            with open(file_path, "rb") as f:
+                image_bytes = f.read()
+            image_b64 = base64.b64encode(image_bytes).decode("utf-8")
+            return await self.upload_playlist_cover(access_token, playlist_id, image_b64)
+        except Exception as e:
+            import logging
+            logging.getLogger("uvicorn").error(f"Error al procesar archivo de portada: {e}")
+            return False
