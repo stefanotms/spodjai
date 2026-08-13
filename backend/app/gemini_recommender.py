@@ -49,44 +49,60 @@ async def generate_recommendations(
 
     try:
         genai.configure(api_key=api_key)
+        import random
         
-        # Dar formato a las canciones guardadas en biblioteca (Me Gusta)
+        # 1. Dar formato a las canciones guardadas en biblioteca (Me Gusta) - Mezclado aleatoriamente para romper bucles
+        saved_tracks_shuffled = list(saved_tracks[:30])
+        random.shuffle(saved_tracks_shuffled)
+        
         saved_tracks_lines = []
-        for i, item in enumerate(saved_tracks[:20], 1):
+        for i, item in enumerate(saved_tracks_shuffled, 1):
             track = item.get("track", {})
             artist = ", ".join([a["name"] for a in track.get("artists", [])])
             name = track.get("name")
             saved_tracks_lines.append(f"{i}. {name} - {artist}")
         saved_tracks_text = "\n".join(saved_tracks_lines) if saved_tracks_lines else "No hay suficientes canciones guardadas."
 
-        # Dar formato a los Tops
+        # 2. Dar formato a los Tops - Mezclado aleatoriamente
+        top_tracks_shuffled = list(top_tracks[:50])
+        random.shuffle(top_tracks_shuffled)
+        
         top_tracks_lines = []
-        for i, t in enumerate(top_tracks[:50], 1):
+        for i, t in enumerate(top_tracks_shuffled, 1):
             artist = ", ".join([a["name"] for a in t.get("artists", [])])
             name = t.get("name")
             top_tracks_lines.append(f"{i}. {name} - {artist}")
         top_tracks_text = "\n".join(top_tracks_lines) if top_tracks_lines else "No hay suficientes datos de canciones más escuchadas."
 
-        # Dar formato a las recientes
-        recent_tracks_lines = []
-        for i, play in enumerate(recent_tracks[:50], 1):
-            track = play.get("track", {})
-            artist = ", ".join([a["name"] for a in track.get("artists", [])])
-            name = track.get("name")
-            recent_tracks_lines.append(f"{i}. {name} - {artist}")
-        recent_tracks_text = "\n".join(recent_tracks_lines) if recent_tracks_lines else "No hay suficientes datos de canciones recientes."
-
-        genres_text = ", ".join(top_genres) if top_genres else "Pop, Rock, Indefinido"
+        # 3. Formatear géneros
+        top_genres_shuffled = list(top_genres)
+        random.shuffle(top_genres_shuffled)
+        genres_text = ", ".join(top_genres_shuffled) if top_genres_shuffled else "Pop, Rock, Indefinido"
 
         comfort_pct = int((1.0 - discovery_ratio) * 100)
         discovery_pct = int(discovery_ratio * 100)
 
-        # Formatear la lista de canciones a excluir para evitar repeticiones
+        # 4. Formatear la lista de exclusión combinando la playlist actual y el historial de reproducción reciente
+        # Esto previene el feedback loop y garantiza variedad absoluta
         exclude_tracks_lines = []
+        exclude_set = set()
+
         if exclude_tracks:
-            for i, t in enumerate(exclude_tracks, 1):
-                exclude_tracks_lines.append(f"{i}. {t.get('track')} - {t.get('artist')}")
-        exclude_tracks_text = "\n".join(exclude_tracks_lines) if exclude_tracks_lines else "Ninguna (esta es la primera generación o la lista estaba vacía)."
+            for t in exclude_tracks:
+                track_name = t.get('track', '').strip().lower()
+                artist_name = t.get('artist', '').strip().lower()
+                exclude_set.add((track_name, artist_name))
+                exclude_tracks_lines.append(f"- {t.get('track')} - {t.get('artist')}")
+
+        for play in recent_tracks[:50]:
+            track = play.get("track", {})
+            name = track.get("name", "").strip().lower()
+            artist = ", ".join([a["name"] for a in track.get("artists", [])]).strip().lower()
+            if (name, artist) not in exclude_set:
+                exclude_set.add((name, artist))
+                exclude_tracks_lines.append(f"- {track.get('name')} - {', '.join([a['name'] for a in track.get('artists', [])])}")
+
+        exclude_tracks_text = "\n".join(exclude_tracks_lines) if exclude_tracks_lines else "Ninguna."
 
         # Definir la regla específica de Mood / Estado de ánimo
         mood_instructions = {
@@ -102,16 +118,13 @@ async def generate_recommendations(
         Eres un DJ de Inteligencia Artificial profesional y un curador de música experto apodado "SpodjAI".
         Tu tarea es analizar el perfil completo del usuario para crear una playlist vibrante y equilibrada de {limit} recomendaciones adaptada a su estado de ánimo deseado.
 
-        AQUÍ ESTÁ EL PERFIL DE GUSTOS DEL USUARIO:
+        AQUÍ ESTÁ EL PERFIL DE GUSTOS REALES Y ESTABLES DEL USUARIO (Mezclado aleatoriamente para mayor variedad):
         ---
         CANCIONES GUARDADAS EN SU BIBLIOTECA (ME GUSTA - ANCLA DE GUSTOS REALES):
         {saved_tracks_text}
 
-        CANCIONES MÁS ESCUCHADAS POR EL USUARIO:
+        CANCIONES MÁS ESCUCHADAS POR EL USUARIO (TOP):
         {top_tracks_text}
-
-        HISTORIAL DE ESCUCHA RECIENTE:
-        {recent_tracks_text}
 
         GÉNEROS PREFERIDOS:
         {genres_text}
@@ -126,10 +139,11 @@ async def generate_recommendations(
            - {comfort_pct}% "Zona de Confort y Hits del Momento": Incluye canciones de sus artistas favoritos, temas guardados en su biblioteca o éxitos/temas de moda del momento que encajen perfectamente con su estilo y con el mood seleccionado.
            - {discovery_pct}% "Descubrimiento y Exploración": Canciones frescas de nuevos artistas, joyas ocultas o temas de micro-géneros compatibles que encajen con el mood seleccionado.
         3. Prioriza canciones que coincidan con la vibra del MOOD SELECCIONADO: {mood_text}
-        4. EVITA ABSOLUTAMENTE REPETIR las siguientes canciones que ya se encuentran en la playlist actual del usuario para que la lista sea fresca y variada:
+        4. EVITA ABSOLUTAMENTE REPETIR las siguientes canciones (tanto las que están en la playlist actual del usuario como las que ha reproducido recientemente en su historial):
         {exclude_tracks_text}
-        5. Recomienda solo canciones reales de artistas reales.
-        6. Devuelve la salida únicamente en formato JSON válido en una lista plana con esta estructura:
+        5. Variedad y secuencia del DJ: Distribuye los artistas a lo largo de la playlist. Evita agrupar canciones del mismo artista de forma consecutiva. No sigas el orden de los datos de entrada del perfil. Queremos una lista con un flujo dinámico, variado y bien mezclado, como en una sesión de DJ real.
+        6. Recomienda solo canciones reales de artistas reales.
+        7. Devuelve la salida únicamente en formato JSON válido en una lista plana con esta estructura:
         [
           {{
             "artist": "Nombre del artista o banda",
